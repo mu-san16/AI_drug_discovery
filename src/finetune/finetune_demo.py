@@ -3,8 +3,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, Dataset
+import os
 import argparse
 import logging
+import re
+from src.finetune.dti_model import MbertPcnnModel
 
 # setting logging
 logging.basicConfig(level = logging.INFO)
@@ -52,4 +55,38 @@ def info_scores(current_step, min_mse_step, min_mse_dev, max_ci_dev, mse_tst, ci
             handle.write(line4+'\n')
         handle.write(line5+'\n')
 
+def restore_best_scores(current_step, best_model_dir_mse, best_model_dir_ci, estimator, input_fn_dev, input_fn_tst):
+    minmse_step=0
+    minmse_dev=10000
+    minmse_ci_dev=0
+    minmse_mse_tst=10000
+    minmse_ci_tst=0
+    maxci_step=0
+    maxci_dev=0
+    maxci_mse_dev=10000
+    maxci_mse_tst=10000
+    maxci_ci_tst=0
 
+    # mse
+    checkpoint_file = "%s/checkpoint" % best_model_dir_mse
+    if os.path.isfile(checkpoint_file):    #file_pathが存在するかどうかの確認
+        with open(checkpoint_file, 'rt') as handle:
+            line = handle.readline()    #fileの最初の行の読み取り
+            best_model_prefix = re.findall(r'"(.*?)"', line)[0]    #クウォート内文章を読み取れる
+        
+        checkpoint_path = "%s/%s" % (best_model_dir_mse, best_model_prefix)
+        eval_results = e
+
+
+    # ci
+    checkpoint_file = "%s/checkpoint" % best_model_dir_ci
+    if os.path.isfile(checkpoint_file):
+        with open(checkpoint_file, 'rt') as handle:
+            line = handle.readline()
+            best_model_prefix = re.findall(r'"(.*?)"', line)[0]
+
+
+def main(argv):
+    del argv
+
+    model = MbertPcnnModel()
